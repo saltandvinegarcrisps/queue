@@ -17,13 +17,11 @@ class Worker {
 	}
 
 	public function runOnce($callback) {
-		$data = $this->queue->pop();
+		$vars = $this->queue->pop();
 
 		if(false === $data) {
 			return;
 		}
-
-		$vars = json_decode($data);
 
 		$callback($vars->job, $vars->data);
 	}
