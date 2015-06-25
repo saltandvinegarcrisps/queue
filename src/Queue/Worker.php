@@ -16,7 +16,7 @@ class Worker {
 		$this->running = true;
 	}
 
-	public function runOnce() {
+	public function runOnce($callback) {
 		$data = $this->queue->pop();
 
 		if(false === $data) {
@@ -25,18 +25,16 @@ class Worker {
 
 		$vars = json_decode($data);
 
-		$obj = unserialize($vars->job);
-
-		$obj->run();
+		$callback($vars->job, $vars->data);
 	}
 
 	public function halt() {
 		$this->running = false;
 	}
 
-	public function run() {
+	public function run($callback) {
 		while($this->running) {
-			$this->runOnce();
+			$this->runOnce($callback);
 
 			sleep($this->interval);
 		}
