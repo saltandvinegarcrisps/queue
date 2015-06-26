@@ -2,17 +2,26 @@
 
 namespace Queue;
 
-class PdoQueue extends Queue implements \Countable {
+class PdoQueue implements MessageQueue, \Countable {
 
 	protected $pdo;
 
 	public function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
+		$this->createTable($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME));
 	}
 
-	protected function createTable() {
-		$sql = 'CREATE TABLE queue (id INT PRIMARY KEY AUTO_INCREMENT, data TEXT NOT NULL)';
-		$this->pdo->exec($sql);
+	protected function createTable($driver) {
+		switch($driver) {
+			case 'sqlite':
+				$sql = 'CREATE TABLE IF NOT EXISTS queue (id INTEGER NOT NULL PRIMARY KEY, data TEXT NOT NULL)';
+				$this->pdo->exec($sql);
+				break;
+			case 'mysql':
+				$sql = 'CREATE TABLE IF NOT EXISTS queue (id INT NOT NULL AUTO_INCREMENT, data TEXT NOT NULL, PRIMARY KEY (id))';
+				$this->pdo->exec($sql);
+				break;
+		}
 	}
 
 	public function count() {
@@ -22,9 +31,9 @@ class PdoQueue extends Queue implements \Countable {
 		return $sth->fetchColumn();
 	}
 
-	public function pushRaw($data) {
+	public function push($message) {
 		$sth = $this->pdo->prepare('INSERT INTO queue (data) VALUES(?)');
-		$sth->execute([$data]);
+		$sth->execute([$message]);
 	}
 
 	public function pop() {
@@ -33,12 +42,10 @@ class PdoQueue extends Queue implements \Countable {
 
 		$row = $sth->fetch(\PDO::FETCH_OBJ);
 
-		$value = $this->unpack($row->data);
-
 		$sth = $this->pdo->prepare('DELETE FROM queue WHERE id = ?');
 		$sth->execute([$row->id]);
 
-		return $value;
+		return $row->data;
 	}
 
 }

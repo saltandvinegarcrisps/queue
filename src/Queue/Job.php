@@ -4,6 +4,6 @@ namespace Queue;
 
 abstract class Job {
 
-	abstract public function run(array $data);
+	use Console;
 
 }

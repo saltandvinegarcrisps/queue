@@ -4,35 +4,47 @@ namespace Queue;
 
 class Worker {
 
+	use Console;
+
 	protected $queue;
 
 	protected $interval;
 
+	protected $handler;
+
 	protected $running;
 
-	public function __construct(Queue $queue, $interval = 1) {
+	public function __construct(MessageQueue $queue, $handler, $interval = 1) {
 		$this->queue = $queue;
+		$this->handler = $handler;
 		$this->interval = $interval;
 		$this->running = true;
 	}
 
-	public function runOnce($callback) {
-		$vars = $this->queue->pop();
+	public function runOnce() {
+		if($this->queue->count()) {
+			$message = $this->queue->pop();
 
-		if(false === $data) {
-			return;
+			call_user_func($this->handler, $message);
 		}
+	}
 
-		$callback($vars->job, $vars->data);
+	public function signal($signo) {
+		$this->output($signo);
+		$this->halt();
 	}
 
 	public function halt() {
+		$this->success('Stopping worker');
+
 		$this->running = false;
 	}
 
-	public function run($callback) {
+	public function run() {
+		$this->success('Starting worker');
+
 		while($this->running) {
-			$this->runOnce($callback);
+			$this->runOnce();
 
 			sleep($this->interval);
 		}
