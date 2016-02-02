@@ -37,6 +37,8 @@ class PdoQueue implements MessageQueue, \Countable {
 	}
 
 	public function pop() {
+		$this->pdo->beginTransaction();
+
 		$sth = $this->pdo->prepare('SELECT * FROM queue ORDER BY id ASC');
 		$sth->execute();
 
@@ -44,6 +46,8 @@ class PdoQueue implements MessageQueue, \Countable {
 
 		$sth = $this->pdo->prepare('DELETE FROM queue WHERE id = ?');
 		$sth->execute([$row->id]);
+
+		$this->pdo->commit();
 
 		return $row->data;
 	}
