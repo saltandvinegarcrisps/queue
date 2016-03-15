@@ -42,6 +42,7 @@ class Worker {
 
 	public function run() {
 		$this->success('Starting worker');
+		$this->success('Queue Size ' . $this->queue->count());
 
 		while($this->running) {
 			$this->runOnce();
