@@ -14,10 +14,10 @@ class Worker {
 
 	protected $running;
 
-	public function __construct(MessageQueue $queue, $handler, $interval = 1) {
+	public function __construct(MessageQueue $queue, $handler, $interval = 0.5) {
 		$this->queue = $queue;
 		$this->handler = $handler;
-		$this->interval = $interval;
+		$this->interval = $interval * 1000000;
 		$this->running = true;
 	}
 
@@ -49,7 +49,7 @@ class Worker {
 		$this->success('Queue Size ' . $this->queue->count());
 
 		while($this->running) {
-			$this->runOnce() || sleep($this->interval);
+			$this->runOnce() || usleep($this->interval);
 		}
 	}
 
