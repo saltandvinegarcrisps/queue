@@ -26,7 +26,11 @@ class Worker {
 			$message = $this->queue->pop();
 
 			call_user_func($this->handler, $message);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	public function signal($signo) {
@@ -45,9 +49,7 @@ class Worker {
 		$this->success('Queue Size ' . $this->queue->count());
 
 		while($this->running) {
-			$this->runOnce();
-
-			sleep($this->interval);
+			$this->runOnce() || sleep($this->interval);
 		}
 	}
 
