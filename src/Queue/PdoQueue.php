@@ -62,6 +62,10 @@ class PdoQueue implements MessageQueue, \Countable {
 				$this->retries++;
 				return $this->pop();
 			}
+			else {
+				// contine throwing
+				throw $e;
+			}
 		}
 
 		// reset retries if everything worked
