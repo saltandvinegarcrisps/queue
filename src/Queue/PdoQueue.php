@@ -6,6 +6,8 @@ class PdoQueue implements MessageQueue, \Countable {
 
 	protected $pdo;
 
+	protected $retries = 0;
+
 	public function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
 		$this->createTable($this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME));
@@ -37,17 +39,33 @@ class PdoQueue implements MessageQueue, \Countable {
 	}
 
 	public function pop() {
-		$this->pdo->beginTransaction();
+		try {
+			$this->pdo->beginTransaction();
 
-		$sth = $this->pdo->prepare('SELECT * FROM queue ORDER BY id ASC');
-		$sth->execute();
+			$sth = $this->pdo->prepare('SELECT * FROM queue ORDER BY id ASC');
+			$sth->execute();
 
-		$row = $sth->fetch(\PDO::FETCH_OBJ);
+			$row = $sth->fetch(\PDO::FETCH_OBJ);
 
-		$sth = $this->pdo->prepare('DELETE FROM queue WHERE id = ?');
-		$sth->execute([$row->id]);
+			$sth = $this->pdo->prepare('DELETE FROM queue WHERE id = ?');
+			$sth->execute([$row->id]);
 
-		$this->pdo->commit();
+			$this->pdo->commit();
+		}
+		catch(\PDOException $e) {
+			// retry deadlock
+			if($e->getCode() == 40001 || $e->getCode() == 1213) {
+				if($this->retries > 3) {
+					throw new \RuntimeException('Failed to recover from deadlock: ' . $e->getMessage());
+				}
+
+				$this->retries++;
+				return $this->pop();
+			}
+		}
+
+		// reset retries if everything worked
+		$this->retries = 0;
 
 		return $row->data;
 	}
