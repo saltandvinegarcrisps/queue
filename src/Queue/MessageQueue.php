@@ -4,8 +4,8 @@ namespace Queue;
 
 interface MessageQueue {
 
-	public function push($message);
+	public function push(string $message);
 
-	public function pop();
+	public function pop(): string;
 
 }

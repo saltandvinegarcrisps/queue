@@ -2,7 +2,7 @@
 
 namespace Queue;
 
-trait Console {
+trait ConsoleTrait {
 
 	public function error($message) {
 		fwrite(STDERR, sprintf("\033[0;31m%s\033[0m", $message).PHP_EOL);

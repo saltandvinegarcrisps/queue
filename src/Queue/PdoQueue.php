@@ -33,12 +33,12 @@ class PdoQueue implements MessageQueue, \Countable {
 		return $sth->fetchColumn();
 	}
 
-	public function push($message) {
+	public function push(string $message) {
 		$sth = $this->pdo->prepare('INSERT INTO queue (data) VALUES(?)');
 		$sth->execute([$message]);
 	}
 
-	public function pop() {
+	public function pop(): string {
 		try {
 			$this->pdo->beginTransaction();
 

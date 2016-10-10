@@ -17,12 +17,12 @@ class RedisQueue implements MessageQueue, \Countable {
 		return $this->redis->lSize('queue:' . $this->channel);
 	}
 
-	public function push($message) {
+	public function push(string $message) {
 		// append to the end (right)
 		$this->redis->rPush('queue:' . $this->channel, $message);
 	}
 
-	public function pop() {
+	public function pop(): string {
 		// pop from the start (left)
 		return $this->redis->lPop('queue:' . $this->channel);
 	}

@@ -4,7 +4,7 @@ namespace Queue;
 
 class Worker {
 
-	use Console;
+	use ConsoleTrait;
 
 	protected $queue;
 
