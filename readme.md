@@ -1,14 +1,11 @@
 
 Queues:
 
-	$memcached = new Memcached();
-	$queue = new Queue\MemcachedQueue($memcached);
-	$queue->push(new TestJob);
+	$queue = new Queue\ArrayQueue;
+	$queue->push('some message or json string');
 
 
 Runner:
 
-	$memcached = new Memcached();
-	$queue = new Queue\MemcachedQueue($memcached);
 	$worker = new Queue\Worker($queue);
 	$worker->run();

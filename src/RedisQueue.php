@@ -8,7 +8,7 @@ class RedisQueue implements MessageQueueInterface
 
     protected $channel;
 
-    public function __construct(\Redis $redis, $channel = 'default')
+    public function __construct(\Redis $redis, string $channel = 'default')
     {
         $this->redis = $redis;
         $this->channel = $channel;
@@ -27,7 +27,7 @@ class RedisQueue implements MessageQueueInterface
 
     public function pop(): string
     {
-        if( ! $this->count()) {
+        if (! $this->count()) {
             throw new \RuntimeException('Queue is empty');
         }
 
