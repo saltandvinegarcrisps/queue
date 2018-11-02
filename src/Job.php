@@ -18,6 +18,11 @@ class Job
         $this->attributes = array_merge($this->defaults, $attributes);
     }
 
+    /**
+     * Create a new job from json string
+     * @param string
+     * @return Job
+     */
     public static function parse(string $json): self
     {
         $attributes = json_decode($json, true);

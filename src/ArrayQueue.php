@@ -4,11 +4,16 @@ namespace Queue;
 
 class ArrayQueue implements MessageQueueInterface
 {
+    use ChannelTrait;
+
     protected $map;
 
-    public function __construct(array $map = [])
-    {
+    public function __construct(
+        array $map = [],
+        string $channel = 'default'
+    ) {
         $this->map = $map;
+        $this->setChannel($channel);
     }
 
     public function count(): int

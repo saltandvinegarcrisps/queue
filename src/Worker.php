@@ -22,12 +22,17 @@ class Worker
         $this->running = true;
     }
 
-    public function runOnce()
+    /**
+     * Run a task from the queue
+     *
+     * @return boolean
+     */
+    public function runOnce(): bool
     {
         if ($this->queue->count()) {
             $message = $this->queue->pop();
 
-            call_user_func($this->handler, $message);
+            \call_user_func($this->handler, $message);
 
             return true;
         }
@@ -35,26 +40,43 @@ class Worker
         return false;
     }
 
-    public function signal($signo)
+    /**
+     * Register signal handler
+     */
+    protected function registerSignalHandler(): void
     {
-        $this->output($signo);
-        $this->halt();
+        $hangup = function (int $signo) {
+            $this->output('Interrupt received: '.$signo);
+            $this->halt();
+        };
+
+        pcntl_async_signals(true);
+
+        pcntl_signal(SIGHUP, $hangup); // 1
+        pcntl_signal(SIGINT, $hangup); // 2
+        pcntl_signal(SIGQUIT, $hangup); // 3
+        pcntl_signal(SIGTERM, $hangup); // 15
     }
 
-    public function halt()
+    /**
+     * Stop the worker
+     */
+    public function halt(): void
     {
         $this->success('Stopping worker');
-
         $this->running = false;
     }
 
-    public function run()
+    /**
+     * Start the worker
+     */
+    public function run(): void
     {
         $this->success('Starting worker');
-        $this->success('Queue Size ' . $this->queue->count());
+        $this->registerSignalHandler();
 
         while ($this->running) {
-            $this->runOnce() || usleep($this->interval);
+            $this->runOnce() || \usleep($this->interval);
         }
     }
 }
