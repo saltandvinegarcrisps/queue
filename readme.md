@@ -33,7 +33,7 @@ ReportsWorker.php
         $task = $job->getTask(); // Report@export
         [$class, $action] = explode('@', $task, 2);
 
-        $ref = ReflectionClass($class);
+        $ref = new ReflectionClass($class);
         $result = $ref->getMethod($action)->invokeArgs(new $class, $job->getArgs());
     };
 
