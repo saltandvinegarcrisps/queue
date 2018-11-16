@@ -1,0 +1,8 @@
+parameters:
+    level: max
+    paths:
+        - %currentWorkingDirectory%/src
+    ignoreErrors:
+        - '#PHPDoc tag#'
+includes:
+    - vendor/slam/phpstan-extensions/conf/slam-rules.neon

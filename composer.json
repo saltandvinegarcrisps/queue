@@ -1,22 +1,25 @@
 {
-	"name": "rwarasaurus/queue",
-	"description": "Queue",
-	"type": "library",
-	"license": "Apache-2.0",
-	"authors": [
-		{
-			"name": "Kieron",
-			"email": "hello@madebykieron.co.uk",
-			"homepage": "http://madebykieron.co.uk",
-			"role": "Developer"
-		}
-	],
-	"require": {
-		"php": ">=7"
-	},
-	"require-dev": {
+    "name": "rwarasaurus/queue",
+    "description": "Queue",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Kieron",
+            "email": "hello@madebykieron.co.uk",
+            "homepage": "http://madebykieron.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7"
+    },
+    "require-dev": {
         "friendsofphp/php-cs-fixer": "dev-master",
-		"phpspec/phpspec": "^3.2"
+        "phpspec/phpspec": "^3.2",
+        "phpstan/phpstan": "~0",
+        "symfony/var-dumper": "~4",
+        "slam/phpstan-extensions": "~2"
     },
     "autoload": {
         "psr-4": {

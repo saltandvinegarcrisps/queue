@@ -29,7 +29,7 @@ class Worker
      */
     public function runOnce(): bool
     {
-        if ($this->queue->count()) {
+        if ($this->queue->count() > 0) {
             $message = $this->queue->pop();
 
             \call_user_func($this->handler, $message);
@@ -50,12 +50,11 @@ class Worker
             $this->halt();
         };
 
-        pcntl_async_signals(true);
-
-        pcntl_signal(SIGHUP, $hangup); // 1
-        pcntl_signal(SIGINT, $hangup); // 2
-        pcntl_signal(SIGQUIT, $hangup); // 3
-        pcntl_signal(SIGTERM, $hangup); // 15
+        \pcntl_async_signals(true);
+        \pcntl_signal(SIGHUP, $hangup); // 1
+        \pcntl_signal(SIGINT, $hangup); // 2
+        \pcntl_signal(SIGQUIT, $hangup); // 3
+        \pcntl_signal(SIGTERM, $hangup); // 15
     }
 
     /**
@@ -76,7 +75,13 @@ class Worker
         $this->registerSignalHandler();
 
         while ($this->running) {
-            $this->runOnce() || \usleep($this->interval);
+            if ($this->runOnce()) {
+                // No time for sleep!
+                continue;
+            }
+
+            // if nothing ran we will sleep for now
+            \usleep($this->interval);
         }
     }
 }
