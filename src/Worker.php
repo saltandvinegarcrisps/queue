@@ -31,6 +31,9 @@ class Worker
     {
         if ($this->queue->count() > 0) {
             $message = $this->queue->pop();
+            
+            $task = json_decode($message, true)['task'];
+            $this->output(sprintf('[%s] Processing: %s', (new \DateTime)->format(\DateTime::RFC3339_EXTENDED), $task));
 
             \call_user_func($this->handler, $message);
 
