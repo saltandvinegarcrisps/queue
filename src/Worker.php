@@ -35,7 +35,14 @@ class Worker
             $task = json_decode($message, true)['task'];
             $this->output(sprintf('[%s] Processing: %s', (new \DateTime)->format(\DateTime::RFC3339_EXTENDED), $task));
 
-            \call_user_func($this->handler, $message);
+            try {
+                \call_user_func($this->handler, $message);
+            } catch (\Throwable $exception) {
+                $this->error(sprintf('[%s] Failure: %s', (new \DateTime)->format(\DateTime::RFC3339_EXTENDED), $task));
+                $this->error($exception->getMessage());
+            }
+
+            $this->success(sprintf('[%s] Finished: %s', (new \DateTime)->format(\DateTime::RFC3339_EXTENDED), $task));
 
             return true;
         }
