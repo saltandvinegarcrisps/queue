@@ -9,4 +9,6 @@ interface MessageQueueInterface
     public function pop(): string;
 
     public function count(): int;
+    
+    public function setChannel(string $channel): void;
 }
